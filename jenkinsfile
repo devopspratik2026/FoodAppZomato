@@ -19,7 +19,10 @@ pipeline {
             }
         }
         stage('SonarQube Analysis') {
-    steps {
+    steps 
+script{
+ def scannerHome = tool 'sonar-scanner'
+withSonarQubeEnv('SonarQubeServer')
         withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'squ_d4c04fa4094723e9da49f2275cb550e6ccc21ff2')]) {
             sh 'sonar-scanner -Dsonar.token=${squ_d4c04fa4094723e9da49f2275cb550e6ccc21ff2}'
         }
