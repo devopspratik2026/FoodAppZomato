@@ -15,14 +15,14 @@ pipeline {
         }
         stage ("Git Checkout") {
             steps {
-                git 'https://github.com/KastroVKiran/Zomato-Project-Kastro.git'
+                git 'https://github.com/devopspratik2026/FoodAppZomato.git'
             }
         }
         stage('SonarQube Analysis') {
     steps {
 script{
  def scannerHome = tool 'sonar-scanner'
-withSonarQubeEnv('SonarQubeServer')
+withSonarQubeEnv('sonar-server')
         withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'squ_d4c04fa4094723e9da49f2275cb550e6ccc21ff2')]) {
             sh 'sonar-scanner -Dsonar.token=${squ_d4c04fa4094723e9da49f2275cb550e6ccc21ff2}'
         }
@@ -30,7 +30,7 @@ withSonarQubeEnv('SonarQubeServer')
 }
 }
 
-        stage("Code Quality Gate"){
+         stage("Code Quality Gate"){
            steps {
                 script {
                     waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
@@ -62,8 +62,8 @@ withSonarQubeEnv('SonarQubeServer')
             steps {
                 script {
                     withDockerRegistry(credentialsId: 'docker') {
-                        sh "docker tag zomato kastrov/zomato:latest "
-                        sh "docker push kastrov/zomato:latest "
+                        sh "docker tag zomato Devopsengineerpratik/zomato:latest "
+                        sh "docker push Devopsengineerpratik/zomato:latest "
                     }
                 }
             }
@@ -72,16 +72,16 @@ withSonarQubeEnv('SonarQubeServer')
             steps {
                 script{
                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){
-                       sh 'docker-scout quickview kastrov/zomato:latest'
-                       sh 'docker-scout cves kastrov/zomato:latest'
-                       sh 'docker-scout recommendations kastrov/zomato:latest'
+                       sh 'docker-scout quickview Devopsengineerpratik/zomato:latest'
+                       sh 'docker-scout cves Devopsengineerpratik/zomato:latest'
+                       sh 'docker-scout recommendations Devopsengineerpratik/zomato:latest'
                    }
                 }
             }
         }
         stage ("Deploy to Container") {
             steps {
-                sh 'docker run -d --name zomato -p 3000:3000 kastrov/zomato:latest'
+                sh 'docker run -d --name zomato -p 3000:3000 Devopsengineerpratik/zomato:latest'
             }
         }
     }
@@ -104,9 +104,22 @@ withSonarQubeEnv('SonarQubeServer')
                 </body>
                 </html>
             """,
-            to: 'kastrokiran@gmail.com',
+            to: 'devops.engineer.pratik@gmail.com',
             mimeType: 'text/html',
             attachmentsPattern: 'trivy.txt'
+        }
+    }
+}
+
+
+
+If the build stage of "OWASP FS SCAN" shows 'UNSTABLE BUILD' replace the below script in OWASP FS SCAN stage
+stage('OWASP FS SCAN') {
+    steps {
+        dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit --update -n', odcInstallation: 'DP-Check'
+        dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+    }
+}
         }
     }
 }
