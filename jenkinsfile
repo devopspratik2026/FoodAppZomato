@@ -120,5 +120,4 @@ stage('OWASP FS SCAN') {
         dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
     }
 }
-    }
-}
+
